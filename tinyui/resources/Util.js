@@ -4,15 +4,15 @@ function openFirstDialog() {
 
 	if (oFirstDialog) {
 		oFirstDialog.open();
-		
+
 	} else {
 		oFirstDialog = new sap.ui.commons.Dialog({
-			width: "400px", 						// sap.ui.core.CSSSize
-			height: "550px",						// sap.ui.core.CSSSize
-			title: "Country Details",				// string
-			applyContentPadding: true,				// boolean
-			modal: true,							// boolean
-			content: [								// sap.ui.core.Control
+			width: "400px", // sap.ui.core.CSSSize
+			height: "550px", // sap.ui.core.CSSSize
+			title: "Country Details", // string
+			applyContentPadding: true, // boolean
+			modal: true, // boolean
+			content: [ // sap.ui.core.Control
 				new sap.ui.commons.form.SimpleForm({
 					content: [
 						new sap.ui.core.Title({
@@ -74,3 +74,26 @@ function openFirstDialog() {
 		oFirstDialog.open();
 	}
 }
+
+$(function() {
+	// one time fetch of CSRF token
+	$.ajax({
+		type: "GET",
+		url: "/",
+		headers: {
+			"X-Csrf-Token": "Fetch"
+		},
+
+		success: function(res, status, xhr) {
+			var sHeaderCsrfToken = "X-Csrf-Token";
+			var sCsrfToken = xhr.getResponseHeader(sHeaderCsrfToken);
+
+			// for POST, PUT, and DELETE requests, add the CSRF token to the header
+			$(document).ajaxSend(function(event, jqxhr, settings) {
+				if (settings.type === "POST" || settings.type === "PUT" || settings.type === "DELETE") {
+					jqxhr.setRequestHeader(sHeaderCsrfToken, sCsrfToken);
+				}
+			});
+		}
+	});
+});
